@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Location</title>
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+    <script>
+        function initMap(lat, lng) {
+            const location = { lat: lat, lng: lng };
+
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: location
+            });
+
+            new google.maps.Marker({
+                position: location,
+                map: map
+            });
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    document.getElementById('location').textContent = `Latitude: ${lat}, Longitude: ${lng}`;
+                    document.getElementById('sendLocation').href = `send-location.html?lat=${lat}&lng=${lng}`;
+                    initMap(lat, lng);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
+</head>
+<body onload="getLocation()">
+    <div id="map"></div>
+    <p id="location"></p>
+    <a id="sendLocation" href="#">Send Location</a>
+</body>
+</html>
