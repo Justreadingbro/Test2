@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Location</title>
+</head>
+<body>
+    <script>
+        function sendLocation() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const lat = urlParams.get('lat');
+            const lng = urlParams.get('lng');
+
+            fetch('https://YOUR_FUNCTION_URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Location sent successfully!");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        sendLocation();
+    </script>
+</body>
+</html>
