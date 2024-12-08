@@ -3,23 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPS Location</title>
+    <title>User Location</title>
     <script>
-        // Function to get GPS location
-        function getLocation() {
+        let userLocation = {};  // Store user location
+
+        // Automatically fetch user location when the page loads
+        window.onload = function() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
+                navigator.geolocation.getCurrentPosition(sendLocationToESP, showError);
             } else {
                 alert("Geolocation is not supported by this browser.");
             }
         }
 
-        function showPosition(position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            document.getElementById("gps-link").innerHTML = "Your Location: <a href='https://www.google.com/maps?q=" + lat + "," + lon + "' target='_blank'>View on Google Maps</a>";
+        // Send the location data to ESP32 (ESP32 needs to listen for this)
+        function sendLocationToESP(position) {
+            userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+
+            // Send location data to ESP32 using a POST request
+            fetch('http://192.168.3.188/location', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userLocation)
+            })
+            .then(response => response.json())
+            .then(data => console.log('Location sent to ESP32:', data))
+            .catch(error => console.error('Error sending location:', error));
         }
 
+        // Handle errors (permission denied, etc.)
         function showError(error) {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
@@ -39,8 +56,7 @@
     </script>
 </head>
 <body>
-    <h1>Welcome to the GPS Location Page</h1>
-    <button onclick="getLocation()">Get My Location</button>
-    <p id="gps-link"></p>
+    <h1>User's GPS Location</h1>
+    <p>Your GPS location is being sent to the ESP32 device. Please keep the page open.</p>
 </body>
 </html>
